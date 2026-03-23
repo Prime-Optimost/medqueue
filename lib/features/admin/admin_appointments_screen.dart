@@ -65,15 +65,15 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
         page: _currentPage,
         limit: _pageSize,
         status: _selectedStatus,
-        date: _selectedDate?.toIso8601String().split('T')[0],
-        doctorId: _selectedDoctorId?.toString(),
+        date: _selectedDate,
+        doctorId: _selectedDoctorId,
       );
 
       setState(() {
         if (reset) {
-          _appointments = result.appointments;
+          _appointments = result.items;
         } else {
-          _appointments.addAll(result.appointments);
+          _appointments.addAll(result.items);
         }
         _hasMorePages = _currentPage < result.totalPages;
         _isLoading = false;
@@ -84,6 +84,7 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
         _isLoading = false;
         _isLoadingMore = false;
       });
+      if (!mounted) return;
       ErrorSnackbar.show(context, 'Failed to load appointments: $e');
     }
   }
@@ -244,13 +245,14 @@ class _AdminAppointmentsScreenState extends State<AdminAppointmentsScreen> {
         SnackBar(content: Text('Appointment status updated to $status')),
       );
     } catch (e) {
+      if (!mounted) return;
       ErrorSnackbar.show(context, 'Failed to update status: $e');
     }
   }
 }
 
 class _AppointmentCard extends StatelessWidget {
-  final Appointment appointment;
+  final AppointmentModel appointment;
   final Function(String) onStatusUpdate;
 
   const _AppointmentCard({

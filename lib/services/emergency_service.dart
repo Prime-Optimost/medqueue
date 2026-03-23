@@ -5,10 +5,17 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/emergency_request.dart';
 
 class EmergencyService {
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   static const String baseUrl = 'http://localhost:3000/api'; // Update for production
+
+  // Get stored JWT token
+  Future<String?> _getToken() async {
+    return await _secureStorage.read(key: 'jwt_token');
+  }
 
   // Get current GPS location with high accuracy
   Future<Position> getCurrentLocation() async {

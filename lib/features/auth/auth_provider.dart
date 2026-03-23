@@ -34,6 +34,20 @@ class AuthProvider extends ChangeNotifier {
     return false;
   }
 
+  Future<bool> checkAuthStatus() async {
+    final isValid = await _authService.checkAuthStatus();
+    if (isValid) {
+      // Token is valid, but we need to get user details if not already set
+      // For now, assume user is set from login
+      // In production, you might want to fetch user details from token
+    } else {
+      _user = null;
+      _token = null;
+    }
+    notifyListeners();
+    return isValid;
+  }
+
   Future<void> logout() async {
     if (_token != null) {
       await _authService.logout(_token!);

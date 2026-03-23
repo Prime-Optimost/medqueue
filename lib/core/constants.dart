@@ -53,27 +53,6 @@ class AppConstants {
   static const String adminQueueReportEndpoint = '/api/admin/reports/queue';
   static const String adminCreateSlotsEndpoint = '/api/admin/doctors/slots';
 
-  // Route Names
-  static const String loginRoute = '/login';
-  static const String registerRoute = '/register';
-  static const String otpRoute = '/otp';
-  static const String splashRoute = '/splash';
-  static const String patientDashboardRoute = '/patient-dashboard';
-  static const String doctorDashboardRoute = '/doctor-dashboard';
-  static const String adminDashboardRoute = '/admin-dashboard';
-  static const String doctorsListRoute = '/doctors-list';
-  static const String bookAppointmentRoute = '/book-appointment';
-  static const String myAppointmentsRoute = '/my-appointments';
-  static const String queueRoute = '/queue';
-  static const String doctorScheduleRoute = '/doctor-schedule';
-  static const String liveQueueRoute = '/live-queue';
-  static const String adminQueueMonitorRoute = '/admin-queue-monitor';
-  static const String adminStatsRoute = '/admin-stats';
-  static const String adminAppointmentsRoute = '/admin-appointments';
-  static const String adminUsersRoute = '/admin-users';
-  static const String adminReportsRoute = '/admin-reports';
-  static const String adminManageSlotsRoute = '/admin-manage-slots';
-
   // User Roles
   static const String rolePatient = 'patient';
   static const String roleDoctor = 'doctor';
@@ -137,10 +116,9 @@ class AppConstants {
   static const String messageSent = 'Message sent successfully';
 
   // Route Names
+  static const String splashRoute = '/splash';
   static const String loginRoute = '/login';
   static const String registerRoute = '/register';
-  static const String otpRoute = '/otp';
-  static const String splashRoute = '/splash';
   static const String patientDashboardRoute = '/patient-dashboard';
   static const String doctorDashboardRoute = '/doctor-dashboard';
   static const String adminDashboardRoute = '/admin-dashboard';
@@ -148,14 +126,18 @@ class AppConstants {
   static const String bookAppointmentRoute = '/book-appointment';
   static const String myAppointmentsRoute = '/my-appointments';
   static const String queueRoute = '/queue';
+  static const String chatbotRoute = '/chatbot';
+  static const String emergencyRoute = '/emergency';
+  static const String chatRoute = '/chat';
   static const String doctorScheduleRoute = '/doctor-schedule';
   static const String liveQueueRoute = '/live-queue';
-  static const String adminQueueMonitorRoute = '/admin-queue-monitor';
   static const String adminStatsRoute = '/admin-stats';
   static const String adminAppointmentsRoute = '/admin-appointments';
   static const String adminUsersRoute = '/admin-users';
   static const String adminReportsRoute = '/admin-reports';
-  static const String adminManageSlotsRoute = '/admin-manage-slots';
+  static const String manageSlotsRoute = '/manage-slots';
+  static const String emergencyAlertsRoute = '/emergency-alerts';
+  static const String doctorChatRoute = '/doctor-chat';
 }
 
 // Comments for academic documentation:

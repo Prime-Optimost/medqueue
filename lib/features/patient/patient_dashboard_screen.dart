@@ -42,6 +42,7 @@ class PatientDashboard extends StatelessWidget {
                 subtitle: const Text('View and manage your appointments'),
                 onTap: () => Navigator.pushNamed(context, '/my-appointments'),
               ),
+            ),
             const SizedBox(height: 16),
             Card(
               child: ListTile(

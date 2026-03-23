@@ -19,22 +19,8 @@ class AppTheme {
   static const Color textPrimary = Color(0xFF212121);
   static const Color textSecondary = Color(0xFF757575);
   static const Color textHint = Color(0xFFBDBDBD);
-  static const Color onSurfaceColor = Color(0xFF212121);
 
-  // Spacing
-  static const double spacingXS = 4.0;
-  static const double spacingS = 8.0;
-  static const double spacingM = 16.0;
-  static const double spacingL = 24.0;
-  static const double spacingXL = 32.0;
-
-  // Border Radius
-  static const double borderRadiusS = 4.0;
-  static const double borderRadiusM = 8.0;
-  static const double borderRadiusL = 12.0;
-
-  // Elevation
-  static const double defaultElevation = 2.0;
+  // Status Colors
   static const Color successColor = Color(0xFF4CAF50);
   static const Color warningColor = Color(0xFFFF9800);
   static const Color errorColor = Color(0xFFF44336);
@@ -49,12 +35,8 @@ class AppTheme {
         primary: primaryColor,
         secondary: accentColor,
         surface: surfaceColor,
-        onSurface: onSurfaceColor,
+        onSurface: Colors.black,
         error: errorColor,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
-        onError: Colors.white,
-        brightness: Brightness.light,
       ),
 
       // App Bar

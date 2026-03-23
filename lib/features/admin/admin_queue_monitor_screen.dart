@@ -13,8 +13,10 @@ class AdminQueueMonitorScreen extends StatefulWidget {
 
 class _AdminQueueMonitorScreenState extends State<AdminQueueMonitorScreen> {
   final QueueService _queueService = QueueService();
-  List<Map<String, dynamic>> _doctors = [];
+  final List<Map<String, dynamic>> _doctors = [];
+  // ignore: prefer_final_fields
   Map<int, List<Map<String, dynamic>>> _queues = {};
+  // ignore: prefer_final_fields
   bool _isLoading = true;
 
   @override

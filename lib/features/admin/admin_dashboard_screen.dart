@@ -34,6 +34,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
+      if (!mounted) return;
       ErrorSnackbar.show(context, 'Failed to load dashboard stats: $e');
     }
   }
@@ -54,6 +55,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             icon: const Icon(Icons.logout),
             onPressed: () async {
               await authProvider.logout();
+              if (!mounted) return;
               Navigator.pushReplacementNamed(context, AppConstants.loginRoute);
             },
           ),
@@ -153,7 +155,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           gradient: LinearGradient(
-            colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+            colors: [color.withValues(alpha: 0.1), color.withValues(alpha: 0.05)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

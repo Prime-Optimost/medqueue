@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import '../services/emergency_service.dart';
+import '../../services/emergency_service.dart';
 
 class EmergencyScreen extends StatefulWidget {
   const EmergencyScreen({super.key});
@@ -36,6 +36,8 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         _currentPosition = position;
         _isLoading = false;
       });
+
+      if (!mounted) return;
 
       // Move camera to current location
       if (_mapController != null && _currentPosition != null) {
@@ -74,11 +76,14 @@ class _EmergencyScreenState extends State<EmergencyScreen> {
         _isLoading = false;
       });
 
+      if (!mounted) return;
+
       // Show confirmation dialog
       _showConfirmationDialog(result);
 
     } catch (e) {
       setState(() => _isLoading = false);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to send SOS: $e')),
       );

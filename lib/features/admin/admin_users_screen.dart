@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants.dart';
 import '../../core/widgets/error_snackbar.dart';
-import '../../services/admin_service.dart';
 import '../../models/user_model.dart';
+import '../../services/admin_service.dart';
 
 class AdminUsersScreen extends StatefulWidget {
   static const routeName = AppConstants.adminUsersRoute;
@@ -18,7 +18,7 @@ class AdminUsersScreen extends StatefulWidget {
 }
 
 class _AdminUsersScreenState extends State<AdminUsersScreen> {
-  List<User> _users = [];
+  List<UserModel> _users = [];
   bool _isLoading = true;
   bool _isLoadingMore = false;
   int _currentPage = 1;
@@ -67,9 +67,9 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
       setState(() {
         if (reset) {
-          _users = result.users;
+          _users = result.items;
         } else {
-          _users.addAll(result.users);
+          _users.addAll(result.items);
         }
         _hasMorePages = _currentPage < result.totalPages;
         _isLoading = false;
@@ -80,6 +80,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
         _isLoading = false;
         _isLoadingMore = false;
       });
+      if (!mounted) return;
       ErrorSnackbar.show(context, 'Failed to load users: $e');
     }
   }
@@ -135,9 +136,9 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     );
   }
 
-  Future<void> _toggleUserStatus(User user) async {
+  Future<void> _toggleUserStatus(UserModel user) async {
     try {
-      await context.read<AdminService>().updateUserStatus(user.id, !user.isActive);
+      await context.read<AdminService>().updateUserStatus(int.parse(user.id), !user.isActive);
       setState(() {
         user.isActive = !user.isActive;
       });
@@ -244,7 +245,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 }
 
 class _UserCard extends StatelessWidget {
-  final User user;
+  final UserModel user;
   final VoidCallback onStatusToggle;
 
   const _UserCard({
@@ -266,7 +267,7 @@ class _UserCard extends StatelessWidget {
                 CircleAvatar(
                   backgroundColor: _getRoleColor(user.role),
                   child: Text(
-                    user.name[0].toUpperCase(),
+                    user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : '',
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
@@ -276,21 +277,21 @@ class _UserCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        user.name,
+                        user.fullName,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
                       Text(user.email),
-                      if (user.phone.isNotEmpty) Text(user.phone),
+                      if (user.phoneNumber.isNotEmpty) Text(user.phoneNumber),
                       const SizedBox(height: 4),
                       Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: _getRoleColor(user.role).withOpacity(0.1),
+                              color: _getRoleColor(user.role).withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
@@ -306,7 +307,7 @@ class _UserCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: user.isActive ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+                              color: user.isActive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(

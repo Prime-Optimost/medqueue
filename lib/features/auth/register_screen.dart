@@ -88,6 +88,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             phoneNumber: _phoneController.text.trim(),
                             email: _emailController.text.trim(),
                             role: _selectedRole,
+                            isActive: true,
+                            createdAt: DateTime.now(),
                           );
 
                           // Register request
@@ -101,6 +103,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               phoneNumber: user.phoneNumber,
                               email: user.email,
                               role: user.role,
+                              isActive: true,
+                              createdAt: DateTime.now(),
                             );
 
                             ScaffoldMessenger.of(context).showSnackBar(

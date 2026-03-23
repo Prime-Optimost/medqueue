@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/chatbot_service.dart';
-import '../models/chatbot_message.dart';
+import '../../services/chatbot_service.dart';
+import '../../models/chatbot_message.dart';
 
 class ChatbotScreen extends StatefulWidget {
   const ChatbotScreen({super.key});
@@ -71,6 +71,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
         ));
         _isLoading = false;
       });
+      if (!mounted) return;
       _scrollToBottom();
 
       // Show emergency banner if flagged
@@ -86,6 +87,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
           timestamp: DateTime.now(),
         ));
       });
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to send message: $e')),
       );

@@ -82,7 +82,7 @@ class _MyAppointmentsScreenState extends State<MyAppointmentsScreen> {
     if (newTime == null) return;
 
     final dateStr = newDate.toIso8601String().split('T')[0];
-    final timeStr = '${newTime.hour.toString().padStart(2, '0')}:${newTime.minute.toString().padStart(2, '0')}:00';
+    final timeStr = '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00';
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final token = authProvider.token;

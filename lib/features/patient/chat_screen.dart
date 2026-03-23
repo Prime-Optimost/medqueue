@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/chat_service.dart';
-import '../models/chat_message.dart';
+import '../../services/chat_service.dart';
+import '../../models/chat_message.dart';
 
 class ChatScreen extends StatefulWidget {
   final String doctorId;
@@ -42,9 +42,11 @@ class _ChatScreenState extends State<ChatScreen> {
         _messages.addAll(messages);
         _isLoading = false;
       });
+      if (!mounted) return;
       _scrollToBottom();
     } catch (e) {
       setState(() => _isLoading = false);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load chat history: $e')),
       );

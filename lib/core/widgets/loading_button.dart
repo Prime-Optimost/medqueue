@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import '../app_theme.dart';
+import '../constants.dart';
 
 class LoadingButton extends StatefulWidget {
   final String text;
@@ -41,7 +42,7 @@ class _LoadingButtonState extends State<LoadingButton> {
       style: ElevatedButton.styleFrom(
         backgroundColor: widget.backgroundColor ?? theme.primaryColor,
         foregroundColor: widget.textColor ?? Colors.white,
-        elevation: widget.elevation ?? AppTheme.defaultElevation,
+        elevation: widget.elevation ?? AppConstants.defaultElevation,
         padding: widget.padding ?? const EdgeInsets.symmetric(
           horizontal: AppTheme.spacingL,
           vertical: AppTheme.spacingM,
@@ -51,7 +52,7 @@ class _LoadingButtonState extends State<LoadingButton> {
             widget.borderRadius ?? AppTheme.radiusM,
           ),
         ),
-        disabledBackgroundColor: (widget.backgroundColor ?? theme.primaryColor).withOpacity(0.6),
+        disabledBackgroundColor: (widget.backgroundColor ?? theme.primaryColor).withValues(alpha: 0.6),
       ),
       child: widget.isLoading
           ? SizedBox(

@@ -10,7 +10,7 @@ import '../../core/widgets/loading_button.dart';
 import '../../services/admin_service.dart';
 
 class AdminManageSlotsScreen extends StatefulWidget {
-  static const routeName = AppConstants.adminManageSlotsRoute;
+  static const routeName = AppConstants.manageSlotsRoute;
   const AdminManageSlotsScreen({super.key});
 
   @override
@@ -27,7 +27,7 @@ class _AdminManageSlotsScreenState extends State<AdminManageSlotsScreen> {
   final _dateController = TextEditingController();
   final _startTimeController = TextEditingController();
   final _endTimeController = TextEditingController();
-  final _intervalController = TextEditingController(text: '30'); // Default 30 minutes
+  final _maxPatientsController = TextEditingController();
 
   @override
   void initState() {
@@ -56,6 +56,7 @@ class _AdminManageSlotsScreenState extends State<AdminManageSlotsScreen> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
+      if (!mounted) return;
       ErrorSnackbar.show(context, 'Failed to load slots: $e');
     }
   }
@@ -77,10 +78,12 @@ class _AdminManageSlotsScreenState extends State<AdminManageSlotsScreen> {
       await context.read<AdminService>().createSlot(slot);
       _clearForm();
       _loadSlots();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Slot created successfully')),
       );
     } catch (e) {
+      if (!mounted) return;
       ErrorSnackbar.show(context, 'Failed to create slot: $e');
     }
   }
@@ -89,10 +92,12 @@ class _AdminManageSlotsScreenState extends State<AdminManageSlotsScreen> {
     try {
       await context.read<AdminService>().deleteSlot(slotId);
       _loadSlots();
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Slot deleted successfully')),
       );
     } catch (e) {
+      if (!mounted) return;
       ErrorSnackbar.show(context, 'Failed to delete slot: $e');
     }
   }

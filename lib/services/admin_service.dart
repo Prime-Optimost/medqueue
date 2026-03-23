@@ -3,21 +3,76 @@
 // Handles all admin-related HTTP requests with error handling
 
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../core/constants.dart';
 import '../models/appointment_model.dart';
-import '../models/doctor_model.dart';
 import '../models/user_model.dart';
 import 'auth_service.dart';
 
+class PaginatedResult<T> {
+  final List<T> items;
+  final int page;
+  final int limit;
+  final int total;
+  final int totalPages;
+
+  PaginatedResult({
+    required this.items,
+    required this.page,
+    required this.limit,
+    required this.total,
+    required this.totalPages,
+  });
+}
+
+class AppointmentData {
+  final String day;
+  final int count;
+
+  AppointmentData({required this.day, required this.count});
+
+  factory AppointmentData.fromJson(Map<String, dynamic> json) {
+    return AppointmentData(
+      day: json['date'] as String,
+      count: json['total_appointments'] as int,
+    );
+  }
+}
+
+class StatusData {
+  final String status;
+  final double percentage;
+
+  StatusData({required this.status, required this.percentage});
+
+  factory StatusData.fromJson(Map<String, dynamic> json, int totalAppointments) {
+    final count = json['count'] as int;
+    final percent = totalAppointments > 0 ? (count / totalAppointments * 100) : 0.0;
+    return StatusData(status: json['status'] as String, percentage: percent);
+  }
+}
+
+class QueueData {
+  final String doctor;
+  final double avgWaitTime;
+
+  QueueData({required this.doctor, required this.avgWaitTime});
+
+  factory QueueData.fromJson(Map<String, dynamic> json) {
+    return QueueData(
+      doctor: json['doctor_name'] as String,
+      avgWaitTime: (json['avg_wait_minutes'] as num).toDouble(),
+    );
+  }
+}
+
 class AdminService {
   final AuthService _authService = AuthService();
-  final String baseUrl = AppConstants.apiBaseUrl;
+  final String baseUrl = AppConstants.baseUrl;
 
   // Get admin statistics
   Future<AdminStats> getStats() async {
-    final response = await _makeAuthenticatedRequest('GET', '/admin/stats');
+    final response = await _makeAuthenticatedRequest('GET', AppConstants.adminStatsEndpoint);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -28,34 +83,35 @@ class AdminService {
   }
 
   // Get appointments with pagination and filters
-  Future<AppointmentsResult> getAppointments({
+  Future<PaginatedResult<AppointmentModel>> getAppointments({
     int page = 1,
     int limit = 20,
     String? status,
-    String? doctorId,
-    String? date,
+    int? doctorId,
+    DateTime? date,
   }) async {
     final queryParams = {
       'page': page.toString(),
       'limit': limit.toString(),
       if (status != null) 'status': status,
-      if (doctorId != null) 'doctorId': doctorId,
-      if (date != null) 'date': date,
+      if (doctorId != null) 'doctor_id': doctorId.toString(),
+      if (date != null) 'date': date.toIso8601String().split('T')[0],
     };
 
-    final uri = Uri.parse('$baseUrl/admin/appointments').replace(queryParameters: queryParams);
-
-    final response = await _makeAuthenticatedRequest('GET', '/admin/appointments', queryParams: queryParams);
+    final response = await _makeAuthenticatedRequest('GET', AppConstants.adminAppointmentsEndpoint, queryParams: queryParams);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      final appointments = (data['appointments'] as List)
-          .map((appointment) => AppointmentModel.fromJson(appointment))
+      final appts = (data['appointments'] as List)
+          .map((appointment) => AppointmentModel.fromJson(Map<String, dynamic>.from(appointment)))
           .toList();
-      final pagination = data['pagination'] as Map<String, dynamic>;
-      return AppointmentsResult(
-        appointments: appointments,
-        totalPages: pagination['pages'] ?? 1,
+
+      return PaginatedResult<AppointmentModel>(
+        items: appts,
+        page: data['pagination']['page'] as int,
+        limit: data['pagination']['limit'] as int,
+        total: data['pagination']['total'] as int,
+        totalPages: data['pagination']['pages'] as int,
       );
     } else {
       throw Exception('Failed to load appointments');
@@ -66,7 +122,7 @@ class AdminService {
   Future<void> updateAppointmentStatus(int appointmentId, String status) async {
     final response = await _makeAuthenticatedRequest(
       'PATCH',
-      '/admin/appointments/$appointmentId/status',
+      '/api/admin/appointments/$appointmentId/status',
       body: {'status': status},
     );
 
@@ -76,37 +132,43 @@ class AdminService {
   }
 
   // Get users with pagination and filters
-  Future<List<User>> getUsers({
+  Future<PaginatedResult<UserModel>> getUsers({
     int page = 1,
     int limit = 20,
     String? role,
-    String? status,
   }) async {
     final queryParams = {
       'page': page.toString(),
       'limit': limit.toString(),
       if (role != null) 'role': role,
-      if (status != null) 'status': status,
     };
 
-    final response = await _makeAuthenticatedRequest('GET', '/admin/users', queryParams: queryParams);
+    final response = await _makeAuthenticatedRequest('GET', AppConstants.adminUsersEndpoint, queryParams: queryParams);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      return (data['users'] as List)
-          .map((user) => User.fromJson(user))
+      final users = (data['users'] as List)
+          .map((user) => UserModel.fromJson(Map<String, dynamic>.from(user)))
           .toList();
+
+      return PaginatedResult<UserModel>(
+        items: users,
+        page: data['pagination']['page'] as int,
+        limit: data['pagination']['limit'] as int,
+        total: data['pagination']['total'] as int,
+        totalPages: data['pagination']['pages'] as int,
+      );
     } else {
       throw Exception('Failed to load users');
     }
   }
 
-  // Update user status
-  Future<void> updateUserStatus(int userId, String status) async {
+  // Update user status (active/inactive)
+  Future<void> updateUserStatus(int userId, bool isActive) async {
     final response = await _makeAuthenticatedRequest(
       'PATCH',
-      '/admin/users/$userId/status',
-      body: {'status': status},
+      '/api/admin/users/$userId/status',
+      body: {'is_active': isActive},
     );
 
     if (response.statusCode != 200) {
@@ -116,7 +178,7 @@ class AdminService {
 
   // Get no-show reports
   Future<List<NoshowReport>> getNoshowReports() async {
-    final response = await _makeAuthenticatedRequest('GET', '/admin/reports/noshow');
+    final response = await _makeAuthenticatedRequest('GET', AppConstants.adminNoshowReportEndpoint);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -130,11 +192,11 @@ class AdminService {
 
   // Get queue performance reports
   Future<List<QueueReport>> getQueueReports() async {
-    final response = await _makeAuthenticatedRequest('GET', '/admin/reports/queue');
+    final response = await _makeAuthenticatedRequest('GET', AppConstants.adminQueueReportEndpoint);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      return (data['reports'] as List)
+      return (data['queueStats'] as List)
           .map((report) => QueueReport.fromJson(report))
           .toList();
     } else {
@@ -142,9 +204,49 @@ class AdminService {
     }
   }
 
+  // Get queue chart data for admin stats (wrapper over queue reports)
+  Future<List<QueueData>> getQueueChartData() async {
+    final queueReports = await getQueueReports();
+    return queueReports
+        .map((report) => QueueData(doctor: report.doctorName, avgWaitTime: report.avgWaitMinutes))
+        .toList();
+  }
+
+  // Get appointment chart data for admin stats
+  Future<List<AppointmentData>> getAppointmentChartData() async {
+    final response = await _makeAuthenticatedRequest('GET', '/api/admin/reports/appointments-week');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return (data['appointmentWeekStats'] as List)
+          .map((item) => AppointmentData.fromJson(Map<String, dynamic>.from(item)))
+          .toList();
+    } else {
+      throw Exception('Failed to load appointment chart data');
+    }
+  }
+
+  // Get status distribution chart data for admin stats
+  Future<List<StatusData>> getStatusChartData() async {
+    final response = await _makeAuthenticatedRequest('GET', '/api/admin/reports/status-distribution');
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final statusCounts = (data['statusDistribution'] as List)
+          .map((item) => Map<String, dynamic>.from(item))
+          .toList();
+      final total = statusCounts.fold<int>(0, (sum, item) => sum + (item['count'] as int));
+      return statusCounts
+          .map((item) => StatusData.fromJson(item, total))
+          .toList();
+    } else {
+      throw Exception('Failed to load status chart data');
+    }
+  }
+
   // Get doctor slots
   Future<List<DoctorSlot>> getDoctorSlots() async {
-    final response = await _makeAuthenticatedRequest('GET', '/admin/slots');
+    final response = await _makeAuthenticatedRequest('GET', AppConstants.adminCreateSlotsEndpoint);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -156,34 +258,22 @@ class AdminService {
     }
   }
 
-  // Create new slots for a doctor
-  Future<void> createDoctorSlots({
-    required int doctorId,
-    required String date,
-    required String startTime,
-    required String endTime,
-    required int intervalMinutes,
-  }) async {
+  // Create new slot
+  Future<void> createSlot(DoctorSlot slot) async {
     final response = await _makeAuthenticatedRequest(
       'POST',
-      '/admin/doctors/slots',
-      body: {
-        'doctor_id': doctorId,
-        'date': date,
-        'start_time': startTime,
-        'end_time': endTime,
-        'interval_minutes': intervalMinutes,
-      },
+      AppConstants.adminCreateSlotsEndpoint,
+      body: slot.toJson(),
     );
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to create doctor slots');
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create slot');
     }
   }
 
   // Delete slot
   Future<void> deleteSlot(int slotId) async {
-    final response = await _makeAuthenticatedRequest('DELETE', '/admin/slots/$slotId');
+    final response = await _makeAuthenticatedRequest('DELETE', '/api/admin/doctors/slots/$slotId');
 
     if (response.statusCode != 200) {
       throw Exception('Failed to delete slot');
@@ -246,6 +336,9 @@ class AdminStats {
   final int pendingAppointments;
   final int completedAppointments;
   final int cancelledAppointments;
+  final int todaysAppointments;
+  final int activeQueueCount;
+  final int pendingEmergencies;
   final double averageWaitTime;
   final double noshowRate;
 
@@ -257,12 +350,12 @@ class AdminStats {
     required this.pendingAppointments,
     required this.completedAppointments,
     required this.cancelledAppointments,
+    required this.todaysAppointments,
+    required this.activeQueueCount,
+    required this.pendingEmergencies,
     required this.averageWaitTime,
     required this.noshowRate,
   });
-
-  int get todaysAppointments => pendingAppointments;
-  int get activeQueueCount => pendingAppointments;
 
   factory AdminStats.fromJson(Map<String, dynamic> json) {
     return AdminStats(
@@ -273,20 +366,13 @@ class AdminStats {
       pendingAppointments: json['pendingAppointments'] ?? 0,
       completedAppointments: json['completedAppointments'] ?? 0,
       cancelledAppointments: json['cancelledAppointments'] ?? 0,
+      todaysAppointments: json['todaysAppointments'] ?? 0,
+      activeQueueCount: json['activeQueueCount'] ?? 0,
+      pendingEmergencies: json['pendingEmergencies'] ?? 0,
       averageWaitTime: (json['averageWaitTime'] ?? 0).toDouble(),
       noshowRate: (json['noshowRate'] ?? 0).toDouble(),
     );
   }
-}
-
-class AppointmentsResult {
-  final List<AppointmentModel> appointments;
-  final int totalPages;
-
-  AppointmentsResult({
-    required this.appointments,
-    required this.totalPages,
-  });
 }
 
 class NoshowReport {

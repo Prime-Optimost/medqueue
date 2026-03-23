@@ -41,6 +41,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
+      if (!mounted) return;
       ErrorSnackbar.show(context, 'Failed to load reports: $e');
     }
   }
@@ -391,7 +392,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -411,7 +412,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen> {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: color.withOpacity(0.8),
+              color: color.withValues(alpha: 0.8),
             ),
             textAlign: TextAlign.center,
           ),

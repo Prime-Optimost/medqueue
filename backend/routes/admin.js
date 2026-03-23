@@ -6,7 +6,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/database'); // Assuming database config exists
 const { authenticateToken, requireRole } = require('../middleware/auth'); // JWT middleware
-const { body, param, query, validationResult } = require('express-validator');
+const { query, validationResult } = require('express-validator');
+const { validateUserStatusUpdate, validateSlotCreation } = require('../middleware/validation');
 const auditLog = require('../utils/auditLog');
 
 // GET /api/admin/stats
@@ -180,16 +181,8 @@ router.get('/users', authenticateToken, requireRole(['admin']), [
 
 // PATCH /api/admin/users/:id/status
 // Admin activates or deactivates a user account
-router.patch('/users/:id/status', authenticateToken, requireRole(['admin']), [
-    param('id').isInt().toInt(),
-    body('is_active').isBoolean(),
-], async (req, res) => {
+router.patch('/users/:id/status', authenticateToken, requireRole(['admin']), validateUserStatusUpdate, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-
         const { id } = req.params;
         const { is_active } = req.body;
 
@@ -261,21 +254,51 @@ router.get('/reports/queue', authenticateToken, requireRole(['admin']), async (r
     }
 });
 
+// GET /api/admin/reports/appointments-week
+// Returns number of appointments per day for the last 7 days
+router.get('/reports/appointments-week', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const [rows] = await db.execute(`
+            SELECT
+                DATE(appointment_date) as date,
+                COUNT(*) as total_appointments
+            FROM appointments
+            WHERE appointment_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+            GROUP BY DATE(appointment_date)
+            ORDER BY DATE(appointment_date)
+        `);
+
+        res.json({ appointmentWeekStats: rows });
+    } catch (error) {
+        console.error('Admin appointments week report error:', error);
+        res.status(500).json({ error: 'Failed to generate appointments week report' });
+    }
+});
+
+// GET /api/admin/reports/status-distribution
+// Returns appointment status counts for charting
+router.get('/reports/status-distribution', authenticateToken, requireRole(['admin']), async (req, res) => {
+    try {
+        const [rows] = await db.execute(`
+            SELECT
+                status,
+                COUNT(*) as count
+            FROM appointments
+            WHERE appointment_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+            GROUP BY status
+        `);
+
+        res.json({ statusDistribution: rows });
+    } catch (error) {
+        console.error('Admin status distribution report error:', error);
+        res.status(500).json({ error: 'Failed to generate status distribution report' });
+    }
+});
+
 // POST /api/admin/doctors/slots
 // Admin creates availability slots for a doctor
-router.post('/doctors/slots', authenticateToken, requireRole(['admin']), [
-    body('doctor_id').isInt().toInt(),
-    body('date').isISO8601(),
-    body('start_time').matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
-    body('end_time').matches(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/),
-    body('interval_minutes').isInt({ min: 15, max: 120 }).toInt(),
-], async (req, res) => {
+router.post('/doctors/slots', authenticateToken, requireRole(['admin']), validateSlotCreation, async (req, res) => {
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).json({ errors: errors.array() });
-        }
-
         const { doctor_id, date, start_time, end_time, interval_minutes } = req.body;
 
         // Generate time slots

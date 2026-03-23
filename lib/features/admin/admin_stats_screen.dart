@@ -51,6 +51,7 @@ class _AdminStatsScreenState extends State<AdminStatsScreen> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
+      if (!mounted) return;
       ErrorSnackbar.show(context, 'Failed to load statistics: $e');
     }
   }

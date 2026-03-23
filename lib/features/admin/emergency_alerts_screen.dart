@@ -4,8 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/emergency_service.dart';
-import '../models/emergency_request.dart';
+import '../../services/emergency_service.dart';
+import '../../models/emergency_request.dart';
 
 class EmergencyAlertsScreen extends StatefulWidget {
   const EmergencyAlertsScreen({super.key});
@@ -46,6 +46,7 @@ class _EmergencyAlertsScreenState extends State<EmergencyAlertsScreen> {
     try {
       await context.read<EmergencyService>().updateEmergencyStatus(emergencyId, status);
       await _loadActiveEmergencies(); // Refresh the list
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Emergency status updated to $status')),
       );

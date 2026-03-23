@@ -39,7 +39,7 @@ class MedQueueApp extends StatelessWidget {
       child: MaterialApp(
         title: 'MedQueue GH',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
+        theme: AppTheme.themeData,
         home: const LoginScreen(),
         routes: {
           LoginScreen.routeName: (_) => const LoginScreen(),

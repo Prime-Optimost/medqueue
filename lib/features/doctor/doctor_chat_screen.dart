@@ -4,9 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/chat_service.dart';
-import '../models/chat_message.dart';
-import 'chat_screen.dart'; // Reusing patient chat screen for individual chats
+import '../../services/chat_service.dart';
+import '../../models/chat_message.dart';
+import '../patient/chat_screen.dart'; // Reusing patient chat screen for individual chats
 
 class DoctorChatScreen extends StatefulWidget {
   const DoctorChatScreen({super.key});
@@ -35,6 +35,7 @@ class _DoctorChatScreenState extends State<DoctorChatScreen> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load conversations: $e')),
       );

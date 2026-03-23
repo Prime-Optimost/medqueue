@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/queue_service.dart';
@@ -42,6 +41,7 @@ class _QueueScreenState extends State<QueueScreen> {
     if (token != null && _queueStatus != null) {
       final success = await _queueService.leaveQueue(token, _queueStatus!['queueId']);
       if (success) {
+        if (!mounted) return;
         Navigator.pop(context);
       }
     }

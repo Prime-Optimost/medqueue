@@ -4,12 +4,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../core/constants.dart';
-import '../features/auth/auth_provider.dart';
-import '../features/auth/login_screen.dart';
-import '../features/admin/admin_dashboard_screen.dart';
-import '../features/doctor/doctor_dashboard_screen.dart';
-import '../features/patient/patient_dashboard_screen.dart';
+import '../../core/constants.dart';
+import 'auth_provider.dart';
+import 'login_screen.dart';
+import '../admin/admin_dashboard_screen.dart';
+import '../doctor/doctor_dashboard_screen.dart';
+import '../patient/patient_dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   static const routeName = AppConstants.splashRoute;
@@ -35,6 +35,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     // Check if user is logged in and token is valid
     final isAuthenticated = await authProvider.checkAuthStatus();
+
+    if (!mounted) return;
 
     if (!isAuthenticated) {
       // Navigate to login if not authenticated
@@ -86,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Colors.black.withValues(alpha: 0.2),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
