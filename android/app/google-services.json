@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "923104798394",
+    "project_id": "medqueue-c8203",
+    "storage_bucket": "medqueue-c8203.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923104798394:android:920910f7f58196cf808483",
+        "android_client_info": {
+          "package_name": "com.example.medqueue"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAEqQHk7XOmJq2AY4ruJTDXrFIaAo8A6lc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
