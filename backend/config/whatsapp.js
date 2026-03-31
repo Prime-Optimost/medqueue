@@ -11,7 +11,14 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID; // <-- PASTE YOUR TWILIO ACCO
 const authToken = process.env.TWILIO_AUTH_TOKEN;   // <-- PASTE YOUR TWILIO AUTH TOKEN HERE IN .env
 const whatsappNumber = process.env.TWILIO_WHATSAPP_NUMBER; // <-- PASTE YOUR TWILIO WHATSAPP NUMBER HERE IN .env
 
-const client = twilio(accountSid, authToken);
+// Initialize Twilio client only if valid credentials are provided
+let client = null;
+if (accountSid && accountSid.startsWith('AC') && authToken) {
+    client = twilio(accountSid, authToken);
+} else {
+    console.warn('⚠️  Twilio credentials not configured. WhatsApp integration disabled.');
+    console.warn('   To enable, add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_WHATSAPP_NUMBER to .env');
+}
 
 // Export client and WhatsApp number
 module.exports = {

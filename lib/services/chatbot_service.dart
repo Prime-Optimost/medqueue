@@ -4,10 +4,11 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../core/api_endpoints.dart';
 import '../models/chatbot_message.dart';
 
 class ChatbotService {
-  static const String baseUrl = 'http://localhost:3000/api'; // Update for production
+  static final String baseUrl = ApiEndpoints.baseUrl;
 
   // Send a message to the chatbot and get response
   Future<ChatbotResponse> sendMessage(String message, String sessionId) async {

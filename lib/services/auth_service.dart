@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import '../core/api_endpoints.dart';
 import '../models/user_model.dart';
 
 // AuthService handles communication with backend authentication API.
 // For academic purposes, every public call is commented to explain exactly what it does.
 class AuthService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  final String _baseUrl = 'http://localhost:3000/api/auth';
+  final String _baseUrl = '${ApiEndpoints.baseUrl}/auth';
 
   // Register user endpoint call
   Future<int?> register(UserModel userModel, String password) async {

@@ -22,7 +22,10 @@ import 'features/doctor/live_queue_screen.dart';
 import 'features/admin/admin_queue_monitor_screen.dart';
 import 'services/admin_service.dart';
 
+
 void main() {
+
+
   runApp(const MedQueueApp());
 }
 

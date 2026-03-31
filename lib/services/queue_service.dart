@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../core/api_endpoints.dart';
 import '../core/firebase_options.dart';
 
 // QueueService handles queue operations and Firebase integration.
@@ -11,7 +12,7 @@ import '../core/firebase_options.dart';
 class QueueService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  final String _baseUrl = 'http://localhost:3000/api/queue';
+  final String _baseUrl = '${ApiEndpoints.baseUrl}/queue';
 
   // Initialize Firebase
   Future<void> initializeFirebase() async {

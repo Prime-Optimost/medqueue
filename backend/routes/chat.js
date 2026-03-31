@@ -139,7 +139,7 @@ router.get('/history/:patientId/:doctorId', authenticateToken, requireRole(['pat
 
 // POST /api/chat/webhook
 // WhatsApp webhook to receive incoming messages
-router.post('/webhook', (req, res) => {
+router.post('/webhook', async (req, res) => {
     try {
         // Verify webhook (in production, implement Twilio signature validation)
         const { From, To, Body, MessageSid } = req.body;

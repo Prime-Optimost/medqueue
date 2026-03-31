@@ -19,7 +19,7 @@ class _ChatbotScreenState extends State<ChatbotScreen> {
   final ScrollController _scrollController = ScrollController();
   final List<ChatbotMessage> _messages = [];
   bool _isLoading = false;
-  String _sessionId = DateTime.now().millisecondsSinceEpoch.toString();
+  final String _sessionId = DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
   void initState() {

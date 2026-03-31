@@ -4,10 +4,11 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../core/api_endpoints.dart';
 import '../models/chat_message.dart';
 
 class ChatService {
-  static const String baseUrl = 'http://localhost:3000/api'; // Update for production
+  static final String baseUrl = ApiEndpoints.baseUrl;
 
   // Send a message to another user
   Future<void> sendMessage({

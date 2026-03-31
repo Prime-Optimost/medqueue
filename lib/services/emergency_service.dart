@@ -6,11 +6,12 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../core/api_endpoints.dart';
 import '../models/emergency_request.dart';
 
 class EmergencyService {
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  static const String baseUrl = 'http://localhost:3000/api'; // Update for production
+  static final String baseUrl = ApiEndpoints.baseUrl;
 
   // Get stored JWT token
   Future<String?> _getToken() async {

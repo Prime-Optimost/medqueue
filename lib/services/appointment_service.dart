@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../core/api_endpoints.dart';
 import '../models/doctor_model.dart';
 import '../models/appointment_model.dart';
 
 // AppointmentService handles all appointment-related API calls.
 // For academic purposes, every public call is commented to explain exactly what it does.
 class AppointmentService {
-  final String _baseUrl = 'http://localhost:3000/api/appointments';
+  final String _baseUrl = '${ApiEndpoints.baseUrl}/appointments';
 
   // Get list of all doctors
   Future<List<DoctorModel>> getDoctors(String token) async {

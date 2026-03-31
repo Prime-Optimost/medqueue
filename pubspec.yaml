@@ -38,7 +38,7 @@ dependencies:
   provider: ^6.0.5
 
   # Firebase dependencies for Sprint 2
-  firebase_core: ^2.15.1
+  firebase_core: ^2.32.0
   cloud_firestore: ^4.9.1
   firebase_messaging: ^14.6.5
 

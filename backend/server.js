@@ -61,16 +61,17 @@ const generalLimiter = rateLimit({
 // CORS Configuration
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests from Flutter app origins
-    const allowedOrigins = [
+    const extraOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : [];
+    const defaultOrigins = [
       'http://localhost:3000',
       'http://10.0.2.2:3000', // Android emulator
       'http://localhost:8080',
       'http://127.0.0.1:8080',
-      // Add production domains when deployed
+      'https://your-app.web.app',
     ];
+    const allowedOrigins = [...defaultOrigins, ...extraOrigins].map(o => o.trim()).filter(o => o);
 
-    // Allow requests with no origin (mobile apps, Postman, etc.)
+    // Allow requests with no origin (mobile apps, tests, curl, etc.)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {

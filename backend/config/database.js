@@ -5,19 +5,33 @@
 const mysql = require('mysql2/promise');
 
 // Database configuration from environment variables
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 3306,
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'medqueue_db',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  acquireTimeout: 60000,
-  timeout: 60000,
-  reconnect: true,
-};
+// Supports either a standard TCP host:port MySQL connection or Cloud SQL Unix socket (Firebase/GCP).
+const cloudSqlConnectionName = process.env.INSTANCE_CONNECTION_NAME;
+
+const dbConfig = cloudSqlConnectionName
+  ? {
+      socketPath: `/cloudsql/${cloudSqlConnectionName}`,
+      user: process.env.DB_USER || 'root',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || 'medqueue_db',
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+      acquireTimeout: 60000,
+      timeout: 60000,
+    }
+  : {
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 3306,
+      user: process.env.DB_USER || 'root',
+      password: process.env.DB_PASSWORD || '',
+      database: process.env.DB_NAME || 'medqueue_db',
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+      acquireTimeout: 60000,
+      timeout: 60000,
+    };
 
 // Create connection pool
 const pool = mysql.createPool(dbConfig);
